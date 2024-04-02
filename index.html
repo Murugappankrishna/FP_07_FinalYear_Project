@@ -1,0 +1,383 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Speech to Text with ChatGPT</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+    @import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap");
+    * {
+      font-size: 1rem;
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #ffffff;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' %3E%3Cdefs%3E%3ClinearGradient id='a' x1='0' x2='0' y1='0' y2='1'%3E%3Cstop offset='0' stop-color='%2380F'/%3E%3Cstop offset='1' stop-color='%23f40'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpattern id='b' width='24' height='24' patternUnits='userSpaceOnUse'%3E%3Ccircle fill='%23ffffff' cx='12' cy='12' r='12'/%3E%3C/pattern%3E%3Crect width='100%25' height='100%25' fill='url(%23a)'/%3E%3Crect width='100%25' height='100%25' fill='url(%23b)' fill-opacity='0.1'/%3E%3C/svg%3E");
+      background-attachment: fixed;
+      box-sizing: border-box;
+    }
+    section {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .container {
+      margin-top: 30px;
+      width: 50%;
+      height: auto;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: safe;
+      align-content: center;
+      background-color: rgba(174, 174, 174, 0.6);
+      border-radius: 20px;
+      backdrop-filter: blur(4px);
+      text-align: center;
+    }
+    .title {
+      font-family: "Montserrat", sans-serif;
+      font-optical-sizing: auto;
+      font-weight: 400;
+      font-style: normal;
+      color: rgb(255, 255, 255);
+      font-size: 1.4em;
+    }
+    #startButton {
+      border: none;
+      cursor: pointer;
+      width: 54px;
+      height: 54px;
+      border-radius: 32px;
+      background-color: red;
+      text-align: center;
+      padding: 0.75em;
+    }
+    #stopButton {
+      border: none;
+      cursor: pointer;
+      width: 54px;
+      height: 54px;
+      background: none;
+    }
+    .button-group {
+      width: 100%;
+      height: 10vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .output-screen {
+      width: 100%;
+      height: auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 0.3em;
+    }
+    .outputText {
+      width: 92%;
+      height: 30vh;
+      overflow-y: scroll;
+      background-color: #242424db;
+      font-family: monospace;
+      font-size: 1em;
+      text-align: justify;
+      color: rgb(255, 255, 255);
+      font-weight: 100;
+      border-radius: 24px;
+      padding: 15px;
+    }
+
+    .outputText::-webkit-scrollbar {
+      width: 0;
+      display: none;
+    }
+
+    .outputText {
+      scrollbar-width: none;
+    }
+
+    .main-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .navbar {
+      width: 96%;
+      height: 10vh;
+      margin: 5px;
+      margin-bottom: 35px;
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 50px 5px 20px;
+    }
+
+    .navbar-list {
+      display: flex;
+    }
+    .navbar-items {
+      margin: 5px 85px 0 0;
+      list-style: none;
+      font-family: montserrat;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 1em;
+      border-bottom: 1.7px solid transparent;
+      padding: 5px;
+    }
+    a{
+        font-family:montserrat ;
+        columns: white;
+        text-decoration: none;
+
+    }
+    a:visited{
+        color: white;
+    }
+
+    .logo {
+      margin: 5px 0px 0 85px;
+      font-family: monospace;
+      color: rgb(255, 255, 255);
+      text-shadow: 2px 2px 3px black;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .logo p {
+      font-size: 2em;
+      font-weight: 900;
+    }
+
+    .navbar-items:hover {
+      border-bottom: 1.7px solid red;
+      transition: 0.5s;
+    }
+
+    .footer {
+      margin: 0;
+      padding: 0;
+      height: auto;
+      background-color: rgb(0, 0, 0);
+    }
+
+    .floating-container {
+      margin: 15px;
+    }
+
+    .list-items {
+      font-family: montserrat;
+      margin: 15px;
+    }
+
+    .footer-container {
+      width: 100%;
+      height: auto;
+      display: flex;
+      justify-content: space-around;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <section>
+    <div class="main-container">
+      <div class="navbar">
+        <div class="logo">
+          <p>Smart Coding Buddy</p>
+        </div>
+        <nav class="navbar-container">
+          <ul class
+
+="navbar-list">
+            <li class="navbar-items"><a href="#footer">About</a></li>
+            <li class="navbar-items">Contact us</li>
+          </ul>
+        </nav>
+      </div>
+      <div class="container">
+        <h1 class="title">AI-Powered Pair Programming</h1>
+        <div class="button-group">
+          <button id="startButton" class="recordButton">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="whitesmoke" class="bi bi-play-fill" viewBox="0 0 16 16">
+              <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393"/>
+            </svg>
+          </button>
+          <button id="stopButton" class="recordButton" style="display: none">
+            <dotlottie-player src="https://lottie.host/f8df0cc5-65c6-43df-aacb-3fdd2106d522/o8cFpoxn1y.json" background="transparent" speed="1" style="width: 54px; height: 54px" loop autoplay></dotlottie-player>
+          </button>
+        </div>
+        <div class="output-screen">
+          <div id="output" class="outputText">
+            Click the button to start recording..
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <footer id="footer" class="footer">
+    <div class="footer-container">
+      <div class="floating-container">
+        <p class="list-items"><strong>Developed and deployed by</strong></p>
+        <p class="list-items">Murugappan M M - 20BEC066</p>
+        <p class="list-items">Saamsundar K V - 20BEC084</p>
+        <p class="list-items">Premgugan P - 21BEC324</p>
+      </div>
+
+      <div class="floating-container">
+        <p class="list-items"><strong>Guided by</strong></p>
+        <p class="list-items">M Nithyakumar M.E., <br />Assistant professor - ECE</p>
+      </div>
+    </div>
+    <div>
+      <center style="color: white; font-family: montserrat; font-weight: 100">
+        Copyrights &copy; reserved for 2024
+      </center>
+    </div>
+  </footer>
+  <script>
+   
+    const startButton = document.getElementById("startButton");
+    const stopButton = document.getElementById("stopButton");
+    const outputDiv = document.getElementById("output");
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    let finalTranscript = "";
+    let isRecognitionInProgress = false;
+
+    recognition.interimResults = true;
+    recognition.continuous = true;
+
+    startButton.addEventListener("click", () => {
+      recognition.start();
+      startButton.style.display = "none";
+      stopButton.style.display = "inline-block";
+      isRecognitionInProgress = true;
+    });
+
+    stopButton.addEventListener("click", () => {
+      recognition.stop();
+      startButton.style.display = "inline-block";
+      stopButton.style.display = "none";
+      isRecognitionInProgress = false;
+      processVoiceInput(finalTranscript);
+      // Process recognized text with ChatGPT
+      const synth = window.speechSynthesis;
+      synth.pause();
+    });
+
+    recognition.onresult = (event) => {
+      let interimTranscript = "";
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        } else {
+          interimTranscript += event.results[i][0].transcript;
+        }
+      }
+      outputDiv.textContent = finalTranscript + interimTranscript; // Update output live
+    };
+
+    recognition.onend = () => {
+      if (!isRecognitionInProgress) {
+        logFinalTranscript();
+      }
+      startButton.style.display = "inline-block";
+      stopButton.style.display = "none";
+    };
+
+    recognition.onerror = (event) => {
+      console.error("Speech recognition error:", event.error);
+      if (event.error === "not-allowed") {
+        outputDiv.textContent =
+          "Microphone access is not allowed. Please enable microphone access and try again.";
+      } else {
+        outputDiv.textContent = "Speech recognition error: " + event.error;
+      }
+      if (!isRecognitionInProgress) {
+        logFinalTranscript();
+      }
+    };
+
+    recognition.onnomatch = () => {
+      console.log("No speech was recognized.");
+      if (!isRecognitionInProgress) {
+        logFinalTranscript();
+      }
+    };
+
+    function logFinalTranscript() {
+      console.log("Final Transcript:", finalTranscript);
+      outputDiv.textContent = finalTranscript;
+      finalTranscript = ""; // Reset finalTranscript for next speech recognition
+    } // Function to send recognized text to ChatGPT
+
+    function processVoiceInput(voiceText) {
+      const API_URL = "https://api.openai.com/v1/chat/completions";
+      const API_KEY = "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"; // Add your OpenAI API key here // Construct request payload
+
+      const requestOptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [{ role: "user", content: voiceText }],
+        }),
+      }; // Send request to ChatGPT API
+
+      fetch(API_URL, requestOptions)
+        .then((res) => res.json())
+        .then((data) => {
+          const chatBotResponse = data.choices[0].message.content;
+          const markdownText = marked(chatBotResponse);
+          displayChat
+
+BotResponse(markdownText, chatBotResponse);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          displayChatBotResponse(
+            "Oops! An error occurred. Please try again."
+          );
+        });
+    } // Function to display ChatGPT response in the app
+
+    function displayChatBotResponse(response, responseVoice) {
+      // Display response in your app interface
+      console.log("ChatGPT Response:", response); // For demonstration, you can update the outputDiv with the response
+      outputDiv.innerHTML = response; // Convert text response to speech
+
+      speakResponse(responseVoice);
+    } // Function to convert text to speech
+
+    function speakResponse(text) {
+      const synth = window.speechSynthesis;
+      const utterance = new SpeechSynthesisUtterance(text); // Optionally, you can set voice and other parameters
+
+      utterance.lang = "en-US";
+      utterance.rate = 1.0; // 1.0 is the default rate // Speak the text
+      window.speechSynthesis.cancel();
+      synth.speak(utterance);
+    }
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/2.1.3/marked.min.js"></script>
+  <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
+</body>
+</html>
